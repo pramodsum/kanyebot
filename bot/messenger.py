@@ -59,6 +59,6 @@ class Messenger(object):
     def serenade(self, channel_id):
         html = urlopen("http://www.kanyerest.xyz/serenade").read()
         soup = BeautifulSoup(html, 'html.parser')
-        song = soup.find("div", "row")
+        song = soup.find("div", attrs={'class':'row'})
         self.send_message(channel_id, song)
 
