@@ -44,10 +44,7 @@ class Messenger(object):
 
     def test_gif_response(self, channel_id):
         attachment = {
-            "pretext": "We bring bots to life. :sunglasses: :thumbsup:",
-            "title": "HAAANH?!?!?",
-            "text": '',
-            "fallback": '',
+            "pretext": "HAAANH?!?!?",
             "image_url": "http://s3.amazonaws.com/rapgenius/tumblr_me2bakjLPb1qlsrn9o1_500.gif",
             "color": "#7CD197",
         }

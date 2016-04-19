@@ -48,7 +48,5 @@ class RtmEventHandler(object):
                     self.msg_writer.write_joke(event['channel'])
                 elif 'attachment' in msg_txt:
                     self.msg_writer.demo_attachment(event['channel'])
-                elif 'test' in msg_txt:
-                    self.msg_writer.test_gif_response(event['channel'])
                 else:
-                    self.msg_writer.write_prompt(event['channel'])
+                    self.msg_writer.test_gif_response(event['channel'])
