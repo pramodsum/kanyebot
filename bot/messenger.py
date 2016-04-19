@@ -56,7 +56,7 @@ class Messenger(object):
         txt = ":face_with_head_bandage: my maker didn't handle this error very well:\n>```{}```".format(err_msg)
         self.send_message(channel_id, txt)
 
-    def serenade(self, channe_id):
+    def serenade(self, channel_id):
         html = urlopen("http://www.kanyerest.xyz/serenade").read()
         soup = BeautifulSoup(html, 'html.parser')
         song = soup.find("div", "row")
