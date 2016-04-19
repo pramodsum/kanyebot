@@ -1,5 +1,7 @@
 import logging
 import random
+from bs4 import BeautifulSoup
+from urllib2 import urlopen
 
 logger = logging.getLogger(__name__)
 
@@ -53,3 +55,11 @@ class Messenger(object):
     def write_error(self, channel_id, err_msg):
         txt = ":face_with_head_bandage: my maker didn't handle this error very well:\n>```{}```".format(err_msg)
         self.send_message(channel_id, txt)
+
+    def serenade(self, channe_id):
+        BASE_URL = "http://www.kanyerest.xyz/serenade"
+        html = urlopen(section_url).read()
+        soup = BeautifulSoup(html, "lxml")
+        song = soup.find("div", "row")
+        self.send_message(channel_id, song)
+
