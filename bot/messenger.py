@@ -42,6 +42,16 @@ class Messenger(object):
         answer = "To eat the chicken on the other side! :laughing:"
         self.send_message(channel_id, answer)
 
+    def test_gif_response(self, channel_id):
+        attachment = {
+            "pretext": "We bring bots to life. :sunglasses: :thumbsup:",
+            "title": "HAAANH?!?!?",
+            "text": '',
+            "fallback": '',
+            "image_url": "http://s3.amazonaws.com/rapgenius/tumblr_me2bakjLPb1qlsrn9o1_500.gif",
+            "color": "#7CD197",
+        }
+        self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
 
     def write_error(self, channel_id, err_msg):
         txt = ":face_with_head_bandage: my maker didn't handle this error very well:\n>```{}```".format(err_msg)
