@@ -51,7 +51,7 @@ class Messenger(object):
             "image_url": "http://s3.amazonaws.com/rapgenius/tumblr_me2bakjLPb1qlsrn9o1_500.gif",
             "color": "#7CD197",
         }
-        self.clients.web.chat.post_message(channel_id, txt, attachments=[attachment], as_user='true')
+        self.clients.web.chat.post_message(channel_id, '', attachments=[attachment], as_user='true')
 
     def write_error(self, channel_id, err_msg):
         txt = ":face_with_head_bandage: my maker didn't handle this error very well:\n>```{}```".format(err_msg)
