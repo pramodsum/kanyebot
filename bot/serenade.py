@@ -1,7 +1,8 @@
-from lxml import html
-import requests
+from bs4 import BeautifulSoup
+from urllib2 import urlopen
 
-page = requests.get('http://www.kanyerest.xyz/serenade')
-content = html.fromstring(page.content)
+BASE_URL = "http://www.kanyerest.xyz/serenade"
 
-print(content)
+html = urlopen(section_url).read()
+soup = BeautifulSoup(html, "lxml")
+print(soup)
