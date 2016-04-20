@@ -3,7 +3,7 @@ import random
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
 import requests
-import dryscrape
+from ghost import Ghost
 
 logger = logging.getLogger(__name__)
 
@@ -59,9 +59,7 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def serenade(self, channel_id):
-        session = dryscrape.Session()
-        session.visit("http://www.kanyerest.xyz/serenade/")
-        response = session.body()
-        soup = BeautifulSoup(response)
-        self.send_message(channel_id, soup)
+        ghost = Ghost()
+        page, resources = ghost.open("http://www.kanyerest.xyz/serenade/")
+        self.send_message(channel_id, ghost.content)
 
