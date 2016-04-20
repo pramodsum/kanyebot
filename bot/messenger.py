@@ -3,6 +3,7 @@ import random
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
 import requests
+import dryscrape
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,9 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def serenade(self, channel_id):
-        html = requests.get("http://www.kanyerest.xyz/serenade/../test").content
-        self.send_message(channel_id, html)
+        session = dryscrape.Session()
+        session.visit("http://www.kanyerest.xyz/serenade/../test")
+        response = session.body()
+        soup = BeautifulSoup(response)
+        self.send_message(channel_id, soup)
 

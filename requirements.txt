@@ -9,3 +9,4 @@ slackclient==1.0.0
 slacker==0.9.9
 websocket-client==0.35.0
 bs4
+dryscrape
