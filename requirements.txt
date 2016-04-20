@@ -10,4 +10,5 @@ slacker==0.9.9
 websocket-client==0.35.0
 bs4
 dryscrape
-libqt4-dev
+libxml2
+libxslt
