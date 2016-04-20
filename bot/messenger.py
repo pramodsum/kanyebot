@@ -60,5 +60,6 @@ class Messenger(object):
     def serenade(self, channel_id):
         ghost = Ghost()
         page, resources = ghost.open("http://www.kanyerest.xyz/serenade/")
+        
         self.send_message(channel_id, ghost.content)
 
