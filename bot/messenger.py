@@ -2,6 +2,7 @@ import logging
 import random
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +58,6 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def serenade(self, channel_id):
-        html = url.get("http://www.kanyerest.xyz/serenade")
+        html = requests.get("http://www.kanyerest.xyz/serenade").content
         self.send_message(channel_id, html)
 
