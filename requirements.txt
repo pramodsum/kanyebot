@@ -12,3 +12,4 @@ bs4
 dryscrape
 libxml2
 libxslt
+lxml

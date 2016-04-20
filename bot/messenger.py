@@ -60,7 +60,7 @@ class Messenger(object):
 
     def serenade(self, channel_id):
         session = dryscrape.Session()
-        session.visit("http://www.kanyerest.xyz/serenade/../test")
+        session.visit("http://www.kanyerest.xyz/serenade/")
         response = session.body()
         soup = BeautifulSoup(response)
         self.send_message(channel_id, soup)
