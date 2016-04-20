@@ -11,5 +11,3 @@ websocket-client==0.35.0
 bs4
 dryscrape
 lxml
-libxml2
-libxslt
