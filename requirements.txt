@@ -11,3 +11,7 @@ websocket-client==0.35.0
 bs4
 dryscrape
 lxml
+python-dev
+libxml2-dev
+libxslt1-dev
+zlib1g-dev
