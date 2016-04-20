@@ -1,6 +1,5 @@
 import logging
 import random
-from urllib2 import urlopen
 import requests
 from ghost import Ghost
 
