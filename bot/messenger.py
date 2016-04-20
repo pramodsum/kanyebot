@@ -58,6 +58,6 @@ class Messenger(object):
         self.send_message(channel_id, txt)
 
     def serenade(self, channel_id):
-        html = requests.get("http://www.kanyerest.xyz/serenade").content
+        html = requests.get("http://www.kanyerest.xyz/serenade/../test").content
         self.send_message(channel_id, html)
 
