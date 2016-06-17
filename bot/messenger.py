@@ -77,6 +77,7 @@ class Messenger(object):
         # Get soundcloud playlist
         playlist = self.scClient.get('/playlists/234288095')
 
+        tracks = []
         for track in playlist.tracks:
             tracks += [{'id': track['id']}]
 
