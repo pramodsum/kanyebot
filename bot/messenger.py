@@ -77,23 +77,30 @@ class Messenger(object):
         # Get soundcloud playlist
         playlist = self.scClient.get('/playlists/234288095')
 
-
-        # Adding new track to end of playlist
-        new_track = self.scClient.get('/resolve', url=link)
-        tracks = [{'id': new_track.id}]
-
+        # Get all tracks currently in playlist
+        tracks = []
         for track in playlist.tracks:
             tracks += [{'id': track['id']}]
 
-        # Updating playlist
-        self.scClient.put(playlist.uri, playlist={
-            'tracks': tracks
-        })
+        # Adding new track to end of playlist
+        new_track = self.scClient.get('/resolve', url=link)
 
         username = self.scClient.get('/me').username
-        txt = '{} added \"{}\" to the Boxer Tunes soundcloud playlist'.format(username, new_track.title)
 
-        self.send_message(channel_id, txt)
+        # make sure track isn't already in playlist
+        if any(track['id'] == new_track.id for track in tracks):
+            txt = "\"" + new_track.title + "\" wasn't added because it already exists in Boxer Tunes."
+            self.send_message(channel_id, txt)
+        else:
+            tracks = [{'id': new_track.id}] + tracks
+
+            # Updating playlist
+            self.scClient.put(playlist.uri, playlist={
+                'tracks': tracks
+            })
+
+            txt = username + "added \"" + new_track.title + "\" to the Boxer Tunes soundcloud playlist"
+            self.send_message(channel_id, txt)
 
     def add_to_spotify(self, channel_id, user_id, msg):
         txt = '{} posted a spotify link to {}'.format(user_id, msg)
