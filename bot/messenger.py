@@ -1,8 +1,6 @@
 import logging
 import random
-import requests
 import soundcloud
-from ghost import Ghost
 
 logger = logging.getLogger(__name__)
 
