@@ -33,22 +33,43 @@ class RtmEventHandler(object):
             pass
 
     def _handle_message(self, event):
+        # If message has an attachment
+        # if 'previous_message' in event:
+        #     msg = event['previous_message']
+        #     print(msg)
+        #     song = msg['title']
+        #     link = msg['from_url']
+        #     service = msg['service_name']
+
+        #     # If message contains soundcloud link
+        #     if 'Soundcloud' in service: 
+        #         self.msg_writer.add_to_soundcloud(event['channel'], song, link, event)
+        #     if 'Spotify' in service:
+        #         self.msg_writer.add_to_spotify(event['channel'], song, link, event)
+
         # Filter out messages from the bot itself
-        if not self.clients.is_message_from_me(event['user']):
+        if 'user' in event: 
+            if not self.clients.is_message_from_me(event['user']):
 
-            msg_txt = event['text']
+                msg_txt = event['text']
 
-            if self.clients.is_bot_mention(msg_txt):
-                # e.g. user typed: "@pybot tell me a joke!"
-                if 'help' in msg_txt:
-                    self.msg_writer.write_help_message(event['channel'])
-                elif re.search('hi|hey|hello|howdy|sup|yo', msg_txt):
-                    self.msg_writer.write_greeting(event['channel'], event['user'])
-                elif 'joke' in msg_txt:
-                    self.msg_writer.write_joke(event['channel'])
-                elif 'attachment' in msg_txt:
-                    self.msg_writer.demo_attachment(event['channel'])
-                elif 'serenade' in msg_txt:
-                    self.msg_writer.serenade(event['channel'])
-                else:
-                    self.msg_writer.test_gif_response(event['channel'])
+                # If message contains soundcloud link
+                if 'https://soundcloud.com' in msg_txt: 
+                    self.msg_writer.add_to_soundcloud(event['channel'], event['user'], event)
+                if 'https://open.spotify.com' in msg_txt:
+                    self.msg_writer.add_to_spotify(event['channel'], event['user'], event)
+
+                if self.clients.is_bot_mention(msg_txt):
+                    # e.g. user typed: "@pybot tell me a joke!"
+                    if 'help' in msg_txt:
+                        self.msg_writer.write_help_message(event['channel'])
+                    elif re.search('hi|hey|hello|howdy|sup|yo', msg_txt):
+                        self.msg_writer.write_greeting(event['channel'], event['user'])
+                    elif 'joke' in msg_txt:
+                        self.msg_writer.write_joke(event['channel'])
+                    elif 'attachment' in msg_txt:
+                        self.msg_writer.demo_attachment(event['channel'])
+                    elif 'serenade' in msg_txt:
+                        self.msg_writer.serenade(event['channel'])
+                    else:
+                        self.msg_writer.test_gif_response(event['channel'])

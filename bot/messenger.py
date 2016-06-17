@@ -1,6 +1,7 @@
 import logging
 import random
 import requests
+import soundcloud
 from ghost import Ghost
 
 logger = logging.getLogger(__name__)
@@ -9,6 +10,13 @@ logger = logging.getLogger(__name__)
 class Messenger(object):
     def __init__(self, slack_clients):
         self.clients = slack_clients
+
+        # log into soundcloud account
+        self.scClient = soundcloud.Client(client_id='37aa5b54501a7ab82d4c207816619f99',
+                           client_secret='94c8f5abf9cd7724675eea56c0125c91',
+                           username='sumu@cookinginpjs.com',
+                           password='kanyebot123',
+                           scope='non-expiring')
 
     def send_message(self, channel_id, msg):
         # in the case of Group and Private channels, RTM channel payload is a complex dictionary
@@ -60,4 +68,33 @@ class Messenger(object):
         ghost = Ghost()
         page, resources = ghost.open("http://www.kanyerest.xyz/serenade/")
         self.send_message(channel_id, ghost.content)
+
+    def add_to_soundcloud(self, channel_id, user_id, msg):
+        # Cleanup link 
+        link = msg['text']
+        link = link[1:len(link) - 1]
+
+        # Get soundcloud playlist
+        playlist = self.scClient.get('/playlists/234288095')
+
+        for track in playlist.tracks:
+            tracks += [{'id': track['id']}]
+
+        # Adding new track to end of playlist
+        new_track = self.scClient.get('/resolve', url=link)
+        tracks += [{'id': new_track.id}]
+
+        # Updating playlist
+        self.scClient.put(playlist.uri, playlist={
+            'tracks': tracks
+        })
+
+        username = self.scClient.get('/me').username
+        txt = '{} added \"{}\" to the Boxer Tunes soundcloud playlist'.format(username, new_track.title)
+
+        self.send_message(channel_id, txt)
+
+    def add_to_spotify(self, channel_id, user_id, msg):
+        txt = '{} posted a spotify link to {}'.format(user_id, msg)
+        self.send_message(channel_id, txt)
 
