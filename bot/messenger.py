@@ -77,13 +77,13 @@ class Messenger(object):
         # Get soundcloud playlist
         playlist = self.scClient.get('/playlists/234288095')
 
-        tracks = []
-        for track in playlist.tracks:
-            tracks += [{'id': track['id']}]
 
         # Adding new track to end of playlist
         new_track = self.scClient.get('/resolve', url=link)
-        tracks += [{'id': new_track.id}]
+        tracks = [{'id': new_track.id}]
+
+        for track in playlist.tracks:
+            tracks += [{'id': track['id']}]
 
         # Updating playlist
         self.scClient.put(playlist.uri, playlist={
