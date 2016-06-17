@@ -1,4 +1,5 @@
 import logging
+import re
 import random
 import soundcloud
 
@@ -67,40 +68,44 @@ class Messenger(object):
         page, resources = ghost.open("http://www.kanyerest.xyz/serenade/")
         self.send_message(channel_id, ghost.content)
 
-    def add_to_soundcloud(self, channel_id, user_id, msg):
-        txt = msg['text']
-        
-        # Cleanup link 
-        link = msg['text']
-        link = link[1:len(link) - 1]
+    def add_to_soundcloud(self, channel_id, msg):
+        added_tracks = []
+        existing_tracks = []
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', msg)
 
-        # Get soundcloud playlist
-        playlist = self.scClient.get('/playlists/234288095')
+        for link in urls:
+            link = link[:len(link) -1]
+            print(link)
+            # Get soundcloud playlist
+            playlist = self.scClient.get('/playlists/234288095')
+            username = self.scClient.get('/me').username
 
-        # Get all tracks currently in playlist
-        tracks = []
-        for track in playlist.tracks:
-            tracks += [{'id': track['id']}]
+            # Get all tracks currently in playlist
+            tracks = []
+            for track in playlist.tracks:
+                tracks += [{'id': track['id']}]
 
-        # Adding new track to end of playlist
-        new_track = self.scClient.get('/resolve', url=link)
+            # Adding new track to end of playlist
+            new_track = self.scClient.get('/resolve', url=link)
 
-        username = self.scClient.get('/me').username
+            # make sure track isn't already in playlist
+            if any(track['id'] == new_track.id for track in tracks):
+                trackStr = "\"" + track["title"] + "\""
+                existing_tracks += [trackStr]
+            else:
+                tracks = [{'id': new_track.id}] + tracks
 
-        # make sure track isn't already in playlist
-        if any(track['id'] == new_track.id for track in tracks):
-            txt = "\"" + new_track.title + "\" wasn't added because it already exists in Boxer Tunes."
-        else:
-            tracks = [{'id': new_track.id}] + tracks
+                # Updating playlist
+                self.scClient.put(playlist.uri, playlist={
+                    'tracks': tracks
+                })
 
-            # Updating playlist
-            self.scClient.put(playlist.uri, playlist={
-                'tracks': tracks
-            })
+                trackStr = "\"" + new_track.title + "\""
+                added_tracks += [trackStr]
 
-            txt = username + "added \"" + new_track.title + "\" to the Boxer Tunes soundcloud playlist"
-
-        self.send_message(channel_id, txt)
+        if len(added_tracks) > 0: 
+            tracks = ', '.join(map(str, added_tracks))
+            self.send_message(channel_id, '{} added {} to Boxer Tunes'.format(username, tracks))
 
     def add_to_spotify(self, channel_id, user_id, msg):
         txt = '{} posted a spotify link to {}'.format(user_id, msg)

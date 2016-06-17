@@ -55,7 +55,7 @@ class RtmEventHandler(object):
 
                 # If message contains soundcloud link
                 if 'https://soundcloud.com' in msg_txt: 
-                    self.msg_writer.add_to_soundcloud(event['channel'], event['user'], event)
+                    self.msg_writer.add_to_soundcloud(event['channel'], msg_txt)
                 # if 'https://open.spotify.com' in msg_txt:
                 #     self.msg_writer.add_to_spotify(event['channel'], event['user'], event)
 
