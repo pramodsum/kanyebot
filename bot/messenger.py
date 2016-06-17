@@ -68,37 +68,43 @@ class Messenger(object):
         self.send_message(channel_id, ghost.content)
 
     def add_to_soundcloud(self, channel_id, user_id, msg):
-        # Cleanup link 
-        link = msg['text']
-        link = link[1:len(link) - 1]
+        txt = msg['text']
+        if msg['text'].startswith('https://soundcloud.com'): 
+            # Cleanup link 
+            link = msg['text']
+            link = link[1:len(link) - 1]
 
-        # Get soundcloud playlist
-        playlist = self.scClient.get('/playlists/234288095')
+            # Get soundcloud playlist
+            playlist = self.scClient.get('/playlists/234288095')
 
-        # Get all tracks currently in playlist
-        tracks = []
-        for track in playlist.tracks:
-            tracks += [{'id': track['id']}]
+            # Get all tracks currently in playlist
+            tracks = []
+            for track in playlist.tracks:
+                tracks += [{'id': track['id']}]
 
-        # Adding new track to end of playlist
-        new_track = self.scClient.get('/resolve', url=link)
+            # Adding new track to end of playlist
+            new_track = self.scClient.get('/resolve', url=link)
 
-        username = self.scClient.get('/me').username
+            username = self.scClient.get('/me').username
 
-        # make sure track isn't already in playlist
-        if any(track['id'] == new_track.id for track in tracks):
-            txt = "\"" + new_track.title + "\" wasn't added because it already exists in Boxer Tunes."
-            self.send_message(channel_id, txt)
+            # make sure track isn't already in playlist
+            if any(track['id'] == new_track.id for track in tracks):
+                txt = "\"" + new_track.title + "\" wasn't added because it already exists in Boxer Tunes."
+            else:
+                tracks = [{'id': new_track.id}] + tracks
+
+                # Updating playlist
+                self.scClient.put(playlist.uri, playlist={
+                    'tracks': tracks
+                })
+
+                txt = username + "added \"" + new_track.title + "\" to the Boxer Tunes soundcloud playlist"
         else:
-            tracks = [{'id': new_track.id}] + tracks
+            # If people posted text before the link
+            # TODO: figure out how to determine if there's other random text after the link
+            txt = "Too much shit happening. Just send me the link again bro."
 
-            # Updating playlist
-            self.scClient.put(playlist.uri, playlist={
-                'tracks': tracks
-            })
-
-            txt = username + "added \"" + new_track.title + "\" to the Boxer Tunes soundcloud playlist"
-            self.send_message(channel_id, txt)
+        self.send_message(channel_id, txt)
 
     def add_to_spotify(self, channel_id, user_id, msg):
         txt = '{} posted a spotify link to {}'.format(user_id, msg)

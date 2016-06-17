@@ -23,12 +23,12 @@ class RtmEventHandler(object):
         if event_type == 'message':
             # message was sent to channel
             self._handle_message(event)
-        elif event_type == 'channel_joined':
-            # you joined a channel
-            self.msg_writer.write_help_message(event['channel'])
-        elif event_type == 'group_joined':
-            # you joined a private group
-            self.msg_writer.write_help_message(event['channel'])
+        # elif event_type == 'channel_joined':
+        #     # you joined a channel
+        #     self.msg_writer.write_help_message(event['channel'])
+        # elif event_type == 'group_joined':
+        #     # you joined a private group
+        #     self.msg_writer.write_help_message(event['channel'])
         else:
             pass
 
@@ -71,5 +71,5 @@ class RtmEventHandler(object):
                     #     self.msg_writer.demo_attachment(event['channel'])
                     # elif 'serenade' in msg_txt:
                     #     self.msg_writer.serenade(event['channel'])
-                    # else:
-                    #     self.msg_writer.test_gif_response(event['channel'])
+                    else:
+                        self.msg_writer.test_gif_response(event['channel'])
