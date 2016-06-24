@@ -2,6 +2,7 @@ import logging
 import re
 import random
 import soundcloud
+import urllib2
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class Messenger(object):
             channel_id = channel_id['id']
         logger.debug('Sending msg: {} to channel: {}'.format(msg, channel_id))
         channel = self.clients.rtm.server.channels.find(channel_id)
-        channel.send_message("{}".format(msg.encode('ascii', 'ignore')))
+        channel.send_message("{}".format(msg.encode('ascii', 'ignore')).decode())
 
     def write_help_message(self, channel_id):
         bot_uid = self.clients.bot_user_id()
@@ -69,43 +70,51 @@ class Messenger(object):
         self.send_message(channel_id, ghost.content)
 
     def add_to_soundcloud(self, channel_id, msg):
-        added_tracks = []
-        existing_tracks = []
-        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', msg)
+        try:
+            added_tracks = []
+            existing_tracks = []
+            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', msg)
+            for link in urls:
+                link = link[:len(link) -1]
+                print(link)
+                # Get soundcloud playlist
+                playlist = self.scClient.get('/playlists/234288095')
+                username = self.scClient.get('/me').username
 
-        for link in urls:
-            link = link[:len(link) -1]
-            print(link)
-            # Get soundcloud playlist
-            playlist = self.scClient.get('/playlists/234288095')
-            username = self.scClient.get('/me').username
+                # Get all tracks currently in playlist
+                tracks = []
+                for track in playlist.tracks:
+                    tracks += [{'id': track['id']}]
 
-            # Get all tracks currently in playlist
-            tracks = []
-            for track in playlist.tracks:
-                tracks += [{'id': track['id']}]
+                # Adding new track to end of playlist
+                new_track = self.scClient.get('/resolve', url=link)
 
-            # Adding new track to end of playlist
-            new_track = self.scClient.get('/resolve', url=link)
+                # make sure track isn't already in playlist
+                if any(track['id'] == new_track.id for track in tracks):
+                    trackStr = "\"" + track["title"] + "\""
+                    existing_tracks += [trackStr]
+                else:
+                    tracks = [{'id': new_track.id}] + tracks
 
-            # make sure track isn't already in playlist
-            if any(track['id'] == new_track.id for track in tracks):
-                trackStr = "\"" + track["title"] + "\""
-                existing_tracks += [trackStr]
-            else:
-                tracks = [{'id': new_track.id}] + tracks
+                    # Updating playlist
+                    self.scClient.put(playlist.uri, playlist={
+                        'tracks': tracks
+                    })
 
-                # Updating playlist
-                self.scClient.put(playlist.uri, playlist={
-                    'tracks': tracks
-                })
+                    trackStr = "\"" + new_track.title + "\""
+                    added_tracks += [trackStr]
 
-                trackStr = "\"" + new_track.title + "\""
-                added_tracks += [trackStr]
+            if len(added_tracks) > 0: 
+                tracks = ', '.join(map(str, added_tracks))
+                self.send_message(channel_id, '{} added {} to Boxer Tunes'.format(username, tracks))
+        except urllib2.HTTPError, err:
+            if err.code == 403:
+                self.send_message(channel_id, "Track isn't available for use w/ API")
+                raise
+            else: 
+                self.send_message(channel_id, "Something didn't work... try a different song")
+                raise
 
-        if len(added_tracks) > 0: 
-            tracks = ', '.join(map(str, added_tracks))
-            self.send_message(channel_id, '{} added {} to Boxer Tunes'.format(username, tracks))
 
     def add_to_spotify(self, channel_id, user_id, msg):
         txt = '{} posted a spotify link to {}'.format(user_id, msg)
